@@ -276,7 +276,7 @@ def menu_principal():
 
 def main():
     global contador  # Indica que a variável contador é global
-    contador += 1    # Incrementa o contador em 1erererddfdfdffdfd
+    contador += 1    # Incrementa o contador em 1
     if contador == 1 :
         abertura() 
         
