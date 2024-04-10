@@ -8,10 +8,9 @@ from tqdm import tqdm
 import tkinter as tk
 import random
 from colorama import Fore, Style
-from utils import baleia,joia,jogar,nome_grupo,caca_palavra,abertura,exibir_subtitulo,exibir_nome_do_programa
-from db_connection import criar_tabelas,exportar_para_csv,apaga_csv
+from utils import baleia,abertura,exibir_subtitulo,nome_app,finalizar
+from db_connection import criar_tabelas
 import pyperclip
-
 
 
 contador = 0
@@ -33,7 +32,6 @@ def inserir_categoria():
     conexao.commit()
     conexao.close()
     listar_categorias()
-
 
 # Função para listar categorias para excluir
 def listar_categorias_sem_vinculo():
@@ -98,7 +96,9 @@ def verificar_categoria_existente_produto(cd_categoria):
 # Função para inserir um novo produto
 def inserir_produto():
     exibir_subtitulo('Cadastro de novos produtos')
+
     listar_categorias_cadastro()
+
     cd_categoria = input("Digite o código da categoria do produto: ")
 
     if not verificar_categoria_existente(cd_categoria):
@@ -150,11 +150,7 @@ def listar_categorias_cadastro():
         tabela_produtos.append(categoria)
 
     print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
-    #voltar_ao_menu_principal()
-    #print("\nLista de Categorias:")
-    #for categoria in categorias:
-    #    print(categoria)
-        
+      
 # Função para listar categorias
 def listar_categorias():
     conexao = sqlite3.connect('cadastro_produtos.db')
@@ -189,11 +185,11 @@ def listar_produtos():
     tabela_produtos = []
 
     for produto in produtos:
-        # Formatting the price to display two decimal places
+       
         produto = list(produto)
-        preco = "{:.2f}".format(produto[3])  # Format price to two decimal places
-        if '.' not in preco:  # Check if it's a whole number
-            preco += '.00'  # Add trailing zeros
+        preco = "{:.2f}".format(produto[3])  
+        if '.' not in preco:  
+            preco += '.00'  
         produto[3] = preco
         tabela_produtos.append(produto)
     
@@ -229,21 +225,14 @@ def menu_crud_produto():
     while True:
         
         print("\n1. Novo")
-        #print("2. Editar")
         print("2. Excluir")
-        #print("4. Excluir Categoria")
-        #print("5. Listar Produtos")
         print('3. Voltar')
         opcao = input("\nEscolha uma opção: ")
         
         if opcao == '1':
-            inserir_produto()
-        #elif opcao == '2':
-        #    baleia()
-        #    voltar_ao_menu_principal()      
+            inserir_produto()      
         elif opcao == '2':
             excluir_produto()
-
         else:
             main()
 
@@ -252,16 +241,11 @@ def menu_crud_categoria():
     while True:
         
         print("\n1. Novo")
-        #print("2. Editar")
         print("2. Excluir")
-        #print("4. Excluir Categoria")
-        #print("5. Listar Produtos")
         print('3. Voltar')
         opcao = input("\nEscolha uma opção: ")
         if opcao == '1':
             inserir_categoria()
-        #elif opcao == '2':
-        #    baleia()
             voltar_ao_menu_principal()      
         elif opcao == '2':
             excluir_categoria()
@@ -275,9 +259,6 @@ def menu_principal():
         print("Menu Principal:\n")
         print("1. Produto")
         print("2. Categoria")
-        #print("3. Excluir Produto")
-        #print("4. Excluir Categoria")
-        #print("5. Listar Produtos")
         print("3. Finalizar Sistema")
         opcao = input("\nEscolha uma opção: ")
         
@@ -286,37 +267,10 @@ def menu_principal():
         elif opcao == '2':
             listar_categorias()
         elif opcao == '3':
-            apaga_csv()
-            exportar_para_csv()
-            os.system('Cls')
-            nome_grupo()
-            time.sleep(2) 
-            joia()
-            time.sleep(2) 
-            os.system('Cls')
-            print('Bem vindo ao BONUS... \n')  
-            opcoes = [1,2,3 ]
-            opcao_escolhida = random.choice(opcoes)
-
-            if opcao_escolhida == 1:
-             
-                caca_palavra ()  
-                    
-            elif opcao_escolhida== 2:
-                jogar()
-                
-            os.system('Cls')
-            print('''Obrigado por utilizar nosso APP...
-                  
-                  ''')        
-            
-            exit()
-            
-            
+            finalizar()  
         else:
             voltar_ao_menu_principal()
             print("Opção inválida. Tente novamente.")
-
 
 # Função principal
 
@@ -327,10 +281,12 @@ def main():
         abertura() 
         
     os.system('cls')
-    exibir_nome_do_programa()
-    criar_tabelas()
+    nome_app()
+    #criar_tabelas()
     menu_principal()
 
 if __name__ == "__main__":
     main()
     
+
+

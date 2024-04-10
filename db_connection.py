@@ -28,10 +28,9 @@ def criar_tabelas():
     
     conexao.commit()
     conexao.close()
-
-
-
+   
     # Exportar dados para CSV
+
 def exportar_para_csv():
     conexao = sqlite3.connect('cadastro_produtos.db')
     cursor = conexao.cursor()
@@ -56,6 +55,7 @@ def exportar_para_csv():
 
     conexao.close()
     # Verifica se os arquivos CSV já existem e, se sim, os exclui
+
 def apaga_csv():
     if os.path.exists('categorias.csv'):
         os.remove('categorias.csv')
