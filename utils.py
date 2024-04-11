@@ -317,16 +317,17 @@ def finalizar():
     os.system('Cls')
     
     
-    print('Bem vindo ao BONUS... \n')  
-    opcoes = [1,2,3 ]
-    opcao_escolhida = random.choice(opcoes)
+   # print('Bem vindo ao BONUS... \n')  
+   
+   # opcoes = [1,2,3 ]
+   # opcao_escolhida = random.choice(opcoes)
 
-    if opcao_escolhida == 1:
+   # if opcao_escolhida == 1:
              
-        caca_palavra ()  
+   #    caca_palavra ()  
                     
-    elif opcao_escolhida== 2:
-        jogar()
+   # elif opcao_escolhida== 2:
+   #    jogar()
                 
     
     
