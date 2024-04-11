@@ -257,14 +257,19 @@ def menu_principal():
         print("Menu Principal:\n")
         print("1. Produto")
         print("2. Categoria")
-        print("3. Finalizar Sistema")
+        print("3. Embalagem")
+        print("4. Finalizar Sistema")
         opcao = input("\nEscolha uma opção: ")
-        
+    
         if opcao == '1':
             listar_produtos()
         elif opcao == '2':
             listar_categorias()
         elif opcao == '3':
+            baleia()
+            time.sleep(2) 
+            main()
+        elif opcao == '4':
             finalizar()  
         else:
             voltar_ao_menu_principal()
