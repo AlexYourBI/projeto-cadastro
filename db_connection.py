@@ -15,12 +15,17 @@ def criar_tabelas():
     conexao = sqlite3.connect('cadastro_produtos.db')
     cursor = conexao.cursor()
     
+    cursor.execute('''CREATE TABLE IF NOT EXISTS TB_EMBALAGEM (
+                        CD_EMBALAGEM INTEGER PRIMARY KEY,
+                        DS_EMBALAGEM TEXT)''')
+
     cursor.execute('''CREATE TABLE IF NOT EXISTS TB_CATEGORIA (
                         CD_CATEGORIA INTEGER PRIMARY KEY,
                         DS_CATEGORIA TEXT)''')
     
     cursor.execute('''CREATE TABLE IF NOT EXISTS TB_PRODUTO (
                         CD_PRODUTO INTEGER PRIMARY KEY,
+                        CD_EMBALAGEM INTEGER,
                         CD_CATEGORIA INTEGER,
                         DS_PRODUTO TEXT,
                         VL_PRECO REAL,
@@ -36,6 +41,9 @@ def exportar_para_csv():
     cursor = conexao.cursor()
 
     # Consulta SQL para recuperar os dados das tabelas
+    cursor.execute('''SELECT * FROM TB_EMBALAGEM''')
+    embalagens = cursor.fetchall()
+
     cursor.execute('''SELECT * FROM TB_CATEGORIA''')
     categorias = cursor.fetchall()
 
@@ -43,6 +51,11 @@ def exportar_para_csv():
     produtos = cursor.fetchall()
 
     # Exportar dados para o arquivo CSV
+    with open('embalagens.csv', 'w', newline='') as arquivo_csv:
+        escritor_csv = csv.writer(arquivo_csv)
+        escritor_csv.writerow(['CD_EMBALAGEM', 'DS_EMBALAGEM'])
+        escritor_csv.writerows(embalagens)
+
     with open('categorias.csv', 'w', newline='') as arquivo_csv:
         escritor_csv = csv.writer(arquivo_csv)
         escritor_csv.writerow(['CD_CATEGORIA', 'DS_CATEGORIA'])
@@ -50,13 +63,16 @@ def exportar_para_csv():
 
     with open('produtos.csv', 'w', newline='') as arquivo_csv:
         escritor_csv = csv.writer(arquivo_csv)
-        escritor_csv.writerow(['CD_PRODUTO', 'CD_CATEGORIA', 'DS_PRODUTO', 'VL_PRECO'])
+        escritor_csv.writerow(['CD_PRODUTO', 'CD_EMBALAGEM','CD_CATEGORIA', 'DS_PRODUTO', 'VL_PRECO'])
         escritor_csv.writerows(produtos)
 
     conexao.close()
     # Verifica se os arquivos CSV já existem e, se sim, os exclui
 
 def apaga_csv():
+    if os.path.exists('embalagens.csv'):
+        os.remove('embalagens.csv')
+
     if os.path.exists('categorias.csv'):
         os.remove('categorias.csv')
 

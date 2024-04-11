@@ -13,6 +13,24 @@ from db_connection import criar_tabelas
 import pyperclip
 contador = 0
 
+# Função para inserir uma nova embalagem-----------------------------------------
+def inserir_embalagem():
+    exibir_subtitulo('Cadastrar embalagem')
+    while True:
+        descricao = input("Digite a descrição da embalagem: ").strip().upper()  # Remova espaços em branco e converta para maiúsculas
+        if descricao:  # Verifica se a descrição não está vazia
+            break
+        else:
+            input("Descrição não pode ser em branco. Por favor, tente novamente.")
+            inserir_embalagem()
+
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("INSERT INTO TB_EMBALAGEM (DS_EMBALAGEM) VALUES (?)", (descricao,))
+    conexao.commit()
+    conexao.close()
+    listar_embalagens()
+
 # Função para inserir uma nova categoria-----------------------------------------
 def inserir_categoria():
     exibir_subtitulo('Cadastrar categoria')
@@ -31,6 +49,22 @@ def inserir_categoria():
     conexao.close()
     listar_categorias()
 
+# Função para listar embalagens para excluir
+def listar_embalagens_sem_vinculo():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT c.CD_EMBALAGEM, c.DS_EMBALAGEM FROM TB_EMBALAGEM c LEFT JOIN TB_PRODUTO p ON c.CD_EMBALAGEM = p.CD_EMBALAGEM WHERE p.CD_EMBALAGEM IS NULL")
+    embalagens = cursor.fetchall()
+    conexao.close()
+    
+    exibir_subtitulo('Lista embalagens sem vículo')
+    headers = ["ID", "Embalagem"]
+    tabela_produtos = []
+    for embalagem in embalagens:
+        tabela_produtos.append(embalagem)
+
+    print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+
 # Função para listar categorias para excluir
 def listar_categorias_sem_vinculo():
     conexao = sqlite3.connect('cadastro_produtos.db')
@@ -46,8 +80,34 @@ def listar_categorias_sem_vinculo():
         tabela_produtos.append(categoria)
 
     print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
-# Função para excluir uma categoria
-    
+
+# Função para excluir uma embalagem##############################################################
+def excluir_embalagem():
+    listar_embalagens_sem_vinculo() 
+    try:
+        cd_embalagem = input("Digite o código da embalagem que deseja excluir: ")
+        conexao = sqlite3.connect('cadastro_produtos.db')
+        cursor = conexao.cursor()
+
+        # Verificar se a embalagem tem produtos vinculados
+        cursor.execute("SELECT COUNT(*) FROM TB_PRODUTO WHERE CD_EMBALAGEM = ?", (cd_embalagem,))
+        total_produtos = cursor.fetchone()[0]
+
+        if total_produtos > 0:
+            print("Esta embalagem possui produtos vinculados e não pode ser excluída.")
+            baleia()#listar_embalagens()
+        else:
+            # Excluir a embalagem
+            cursor.execute("DELETE FROM TB_EMBALAGEM WHERE CD_EMBALAGEM = ?", (cd_embalagem,))
+            conexao.commit()
+            print("Embalagem excluída com sucesso.")
+            listar_embalagens()
+        conexao.close()
+        
+    except sqlite3.Error as e:
+        print("Erro ao excluir a embalagem:", e)
+
+# Função para excluir uma categoria ###########################################################################    
 def excluir_categoria():
     listar_categorias_sem_vinculo() 
     try:
@@ -69,10 +129,10 @@ def excluir_categoria():
             print("Categoria excluída com sucesso.")
             listar_categorias()
         conexao.close()
-        
+
     except sqlite3.Error as e:
         print("Erro ao excluir a categoria:", e)
-     
+             
 # verifica categoria
 def verificar_categoria_existente(cd_categoria):
     conexao = sqlite3.connect('cadastro_produtos.db')
@@ -81,6 +141,16 @@ def verificar_categoria_existente(cd_categoria):
     resultado = cursor.fetchone()[0]
     conexao.close()
     return resultado > 0
+
+# verifica embalagem
+def verificar_embalagem_existente(cd_embalagem):
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT COUNT(*) FROM TB_EMBALAGEM WHERE CD_EMBALAGEM = ?", (cd_embalagem,))
+    resultado = cursor.fetchone()[0]
+    conexao.close()
+    return resultado > 0
+
 
 # verifica produto
 def verificar_categoria_existente_produto(cd_categoria):
@@ -95,13 +165,10 @@ def verificar_categoria_existente_produto(cd_categoria):
 def inserir_produto():
     exibir_subtitulo('Cadastro de novos produtos')
 
-    listar_categorias_cadastro()
-
-    cd_categoria = input("Digite o código da categoria do produto: ")
-
-    if not verificar_categoria_existente(cd_categoria):
-        print("\nA categoria selecionada não está cadastrada. \n\nNão é possível cadastrar o produto.")
-        
+    listar_embalagens_cadastro()
+    cd_embalagem = input("Digite o código da embalagem do produto: ")
+    if not verificar_embalagem_existente(cd_embalagem):
+        print("\nA embalagem selecionada não está cadastrada. \n\nNão é possível cadastrar o produto.")
         try:
             valida = int(input('\nDeseja continuar o cadastro digite [ 1 ] ou ENTER para Voltar :  '))
             if  valida == 1 :
@@ -110,7 +177,10 @@ def inserir_produto():
         except ValueError: 
                 listar_produtos()
                 return
-    
+
+
+
+
     while True:
         descricao = input("Digite a descrição do produto: ").strip().upper()  # Remova espaços em branco e converta para maiúsculas
         if descricao:  # Verifica se a descrição não está vazia
@@ -134,6 +204,21 @@ def inserir_produto():
         print('Informe o preço correto')
         return
 
+# Função para listar embalagens
+def listar_embalagens_cadastro():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM TB_EMBALAGEM")
+    embalagens = cursor.fetchall()
+    conexao.close()
+    
+    headers = ["ID", "Embalagem"]
+    tabela_produtos = []
+    for embalagem in embalagens:
+        tabela_produtos.append(embalagem)
+
+    print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+
 # Função para listar categorias
 def listar_categorias_cadastro():
     conexao = sqlite3.connect('cadastro_produtos.db')
@@ -148,7 +233,24 @@ def listar_categorias_cadastro():
         tabela_produtos.append(categoria)
 
     print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
-      
+
+# Função para listar embalagens
+def listar_embalagens():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM TB_EMBALAGEM")
+    embalagens = cursor.fetchall()
+    conexao.close()
+    
+    exibir_subtitulo('Lista embalagens')
+    headers = ["ID", "Embalagem"]
+    tabela_produtos = []
+    for embalagem in embalagens:
+        tabela_produtos.append(embalagem)
+
+    print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+    menu_crud_embalagem()
+
 # Função para listar categorias
 def listar_categorias():
     conexao = sqlite3.connect('cadastro_produtos.db')
@@ -164,10 +266,6 @@ def listar_categorias():
         tabela_produtos.append(categoria)
 
     print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
-    #voltar_ao_menu_principal()
-    #print("\nLista de Categorias:")
-    #for categoria in categorias:
-    #    print(categoria)
     menu_crud_categoria()
         
 def listar_produtos():
@@ -244,9 +342,28 @@ def menu_crud_categoria():
         opcao = input("\nEscolha uma opção: ")
         if opcao == '1':
             inserir_categoria()
-            voltar_ao_menu_principal()      
+            #voltar_ao_menu_principal()      
         elif opcao == '2':
+            listar_categorias_sem_vinculo()
             excluir_categoria()
+
+        else:
+            main()
+
+# Menu CRUD_embalagem
+def menu_crud_embalagem():  
+    while True:
+        
+        print("\n1. Novo")
+        print("2. Excluir")
+        print('3. Voltar')
+        opcao = input("\nEscolha uma opção: ")
+        if opcao == '1':
+            inserir_embalagem()
+            #voltar_ao_menu_principal()      
+        elif opcao == '2':
+            listar_embalagens_sem_vinculo()
+            excluir_embalagem()
 
         else:
             main()
@@ -266,8 +383,7 @@ def menu_principal():
         elif opcao == '2':
             listar_categorias()
         elif opcao == '3':
-            baleia()
-            time.sleep(2) 
+            listar_embalagens()
             main()
         elif opcao == '4':
             finalizar()  
