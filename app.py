@@ -11,8 +11,6 @@ from colorama import Fore, Style
 from utils import baleia,abertura,exibir_subtitulo,nome_app,finalizar
 from db_connection import criar_tabelas
 import pyperclip
-
-
 contador = 0
 
 # Função para inserir uma nova categoria-----------------------------------------
