@@ -1,14 +1,6 @@
 import sqlite3
 import csv
 import os
-import time
-import sys
-from tabulate import tabulate
-from tqdm import tqdm
-import tkinter as tk
-import random
-from colorama import Fore, Style
-
 
 # Função para criar as tabelas se ainda não existirem no banco de dados
 def criar_tabelas():

@@ -1,19 +1,12 @@
 import sqlite3
-import csv
 import os
-import time
-import sys
 from tabulate import tabulate
-from tqdm import tqdm
-import tkinter as tk
-import random
 from colorama import Fore, Style
 from utils import baleia,abertura,exibir_subtitulo,nome_app,finalizar
-from db_connection import criar_tabelas
-import pyperclip
+
 contador = 0
 
-# Função para inserir uma nova embalagem-----------------------------------------
+# Função para inserir uma nova embalagem
 def inserir_embalagem():
     exibir_subtitulo('Cadastrar embalagem')
     while True:
@@ -31,7 +24,7 @@ def inserir_embalagem():
     conexao.close()
     listar_embalagens()
 
-# Função para inserir uma nova categoria-----------------------------------------
+# Função para inserir uma nova categoria
 def inserir_categoria():
     exibir_subtitulo('Cadastrar categoria')
     while True:
@@ -81,7 +74,7 @@ def listar_categorias_sem_vinculo():
 
     print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
 
-# Função para excluir uma embalagem##############################################################
+# Função para excluir uma embalagem
 def excluir_embalagem():
     listar_embalagens_sem_vinculo() 
     try:
@@ -107,7 +100,7 @@ def excluir_embalagem():
     except sqlite3.Error as e:
         print("Erro ao excluir a embalagem:", e)
 
-# Função para excluir uma categoria ###########################################################################    
+# Função para excluir uma categoria
 def excluir_categoria():
     listar_categorias_sem_vinculo() 
     try:
@@ -150,7 +143,6 @@ def verificar_embalagem_existente(cd_embalagem):
     resultado = cursor.fetchone()[0]
     conexao.close()
     return resultado > 0
-
 
 # verifica produto
 def verificar_categoria_existente_produto(cd_categoria):
@@ -446,9 +438,7 @@ def menu_principal():
             voltar_ao_menu_principal()
             print("Opção inválida. Tente novamente.")
 
-
 # Menu opcao cadastro
-
 def menu_opcao_cadastro(parametro):
     while True:
         if parametro == 1:

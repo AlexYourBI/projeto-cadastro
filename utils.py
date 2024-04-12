@@ -1,11 +1,8 @@
-import sqlite3
-import csv
 import os
 import time
 import sys
 from tabulate import tabulate
 from tqdm import tqdm
-import tkinter as tk
 import random
 from colorama import Fore, Style
 import keyboard
@@ -13,8 +10,6 @@ import webbrowser
 from db_connection import apaga_csv,exportar_para_csv, criar_tabelas
 #abertura do sistema com abresentação do gato e a barra de carregamento
 
-def exibir_nome_do_programa():
-    nome_app()
 #---------------
 
 palavras = ['alex', 'python', 'fiap','leo','joao','minas','gabriel', 'zl']
