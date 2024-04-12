@@ -165,10 +165,12 @@ def verificar_categoria_existente_produto(cd_categoria):
 def inserir_produto():
     exibir_subtitulo('Cadastro de novos produtos')
 
-    listar_embalagens_cadastro()
-    cd_embalagem = input("Digite o código da embalagem do produto: ")
-    if not verificar_embalagem_existente(cd_embalagem):
-        print("\nA embalagem selecionada não está cadastrada. \n\nNão é possível cadastrar o produto.")
+    listar_categorias_cadastro()
+
+    cd_categoria = input("Por favor, insira o [ID] correspondente à categoria do produto que você pretende cadastrar: ")
+     
+    if not verificar_categoria_existente(cd_categoria):
+        print("\nA categoria selecionada não está cadastrada. \nNão é possível cadastrar o produto.") 
         try:
             valida = int(input('\nDeseja continuar o cadastro digite [ 1 ] ou ENTER para Voltar :  '))
             if  valida == 1 :
@@ -177,12 +179,13 @@ def inserir_produto():
         except ValueError: 
                 listar_produtos()
                 return
-
-
-
-
+    exibir_subtitulo('Cadastro de novos produtos')
+    #listar_categorias_cadastro(cd_categoria)
+    
+    ds_categoria = obter_descricao_categoria(cd_categoria)
+    
     while True:
-        descricao = input("Digite a descrição do produto: ").strip().upper()  # Remova espaços em branco e converta para maiúsculas
+        descricao = input(f"[ {ds_categoria} ]\nPor favor, digite a descrição do produto: ").strip().upper()  # Remova espaços em branco e converta para maiúsculas
         if descricao:  # Verifica se a descrição não está vazia
             break
         else:
@@ -190,13 +193,37 @@ def inserir_produto():
             inserir_produto()
 
     try: 
-        preco_input = input("Digite o preço do produto: ")
+        exibir_subtitulo('Cadastro de novos produtos')
+        preco_input = input(f"[ {ds_categoria} ] [ {descricao} ]\nInforme o preço do produto : ")
         preco_input = preco_input.replace(',', '.')  # Substitui ',' por '.'
         preco = float(preco_input)
 
+
+
+
+        exibir_subtitulo('Cadastro de novos produtos')
+        print (f'[ {ds_categoria} ] [ {descricao} ] [{preco}]')
+        listar_embalagens_cadastro()
+        
+        cd_embalagem = input(f"\nDigite o [ ID ] da embalagem : ")
+        
+        if not verificar_embalagem_existente(cd_embalagem):
+            print("\nA embalagem selecionada não está cadastrada. \n\nNão é possível cadastrar o produto.")
+            try:
+                valida = int(input('\nDeseja continuar o cadastro digite [ 1 ] ou ENTER para Voltar :  '))
+                if  valida == 1 :
+                    inserir_produto()
+                    return
+            except ValueError: 
+                    listar_produtos()
+                    return
+        exibir_subtitulo('Cadastro de novos produtos')
+
+
+
         conexao = sqlite3.connect('cadastro_produtos.db')
         cursor = conexao.cursor()
-        cursor.execute("INSERT INTO TB_PRODUTO (CD_CATEGORIA, DS_PRODUTO, VL_PRECO) VALUES (?, ?, ?)", (cd_categoria, descricao, preco))
+        cursor.execute("INSERT INTO TB_PRODUTO (CD_EMBALAGEM,CD_CATEGORIA, DS_PRODUTO, VL_PRECO) VALUES (?, ?, ? , ?)", (cd_embalagem,cd_categoria, descricao, preco))
         conexao.commit()
         conexao.close()
         listar_produtos()
@@ -217,22 +244,42 @@ def listar_embalagens_cadastro():
     for embalagem in embalagens:
         tabela_produtos.append(embalagem)
 
-    print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+    if len(tabela_produtos) == 0:
+        print("\033[31mNão há embalagens cadastradas.\033[0m") 
+        baleia()
+        menu_opcao_cadastro(2)
+    else:       
 
-# Função para listar categorias
+        print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+
 def listar_categorias_cadastro():
     conexao = sqlite3.connect('cadastro_produtos.db')
     cursor = conexao.cursor()
     cursor.execute("SELECT * FROM TB_CATEGORIA")
     categorias = cursor.fetchall()
     conexao.close()
-    
     headers = ["ID", "Categoria"]
     tabela_produtos = []
     for categoria in categorias:
         tabela_produtos.append(categoria)
+    
+    if len(tabela_produtos) == 0:
+        print("\033[31mNão há categorias cadastradas.\033[0m") 
+        baleia()
+        menu_opcao_cadastro(1)
+    else:
+        print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
 
-    print(tabulate(tabela_produtos, headers=headers, tablefmt="grid"))
+def obter_descricao_categoria(cd_categoria):
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT DS_CATEGORIA FROM TB_CATEGORIA WHERE CD_CATEGORIA = ?", (cd_categoria,))
+    resultado = cursor.fetchone()
+    conexao.close()
+    if resultado:
+        return resultado[0]
+    else:
+        return None
 
 # Função para listar embalagens
 def listar_embalagens():
@@ -242,7 +289,7 @@ def listar_embalagens():
     embalagens = cursor.fetchall()
     conexao.close()
     
-    exibir_subtitulo('Lista embalagens')
+    exibir_subtitulo('Cadastro de Embalagens')
     headers = ["ID", "Embalagem"]
     tabela_produtos = []
     for embalagem in embalagens:
@@ -259,7 +306,7 @@ def listar_categorias():
     categorias = cursor.fetchall()
     conexao.close()
     
-    exibir_subtitulo('Lista Categorias')
+    exibir_subtitulo('Cadastro de Categorias')
     headers = ["ID", "Categoria"]
     tabela_produtos = []
     for categoria in categorias:
@@ -271,13 +318,13 @@ def listar_categorias():
 def listar_produtos():
     conexao = sqlite3.connect('cadastro_produtos.db')
     cursor = conexao.cursor()
-    cursor.execute("SELECT p.CD_PRODUTO, c.DS_CATEGORIA, p.DS_PRODUTO, p.VL_PRECO FROM TB_PRODUTO p inner join TB_CATEGORIA c on p.CD_CATEGORIA = c.CD_CATEGORIA" )
+    cursor.execute("SELECT p.CD_PRODUTO,  c.DS_CATEGORIA, p.DS_PRODUTO, p.VL_PRECO, e.DS_EMBALAGEM FROM TB_PRODUTO p inner join TB_CATEGORIA c on p.CD_CATEGORIA = c.CD_CATEGORIA inner join TB_EMBALAGEM e on p.CD_EMBALAGEM = e.CD_EMBALAGEM" )
     produtos = cursor.fetchall()
     conexao.close()
     
     exibir_subtitulo('Lista de produtos')
 
-    headers = ["ID", "Categoria", "Produto", "Preço"]
+    headers = ["ID","Categoria", "Produto", "Preço", "Embalagem"]
     tabela_produtos = []
 
     for produto in produtos:
@@ -386,10 +433,50 @@ def menu_principal():
             listar_embalagens()
             main()
         elif opcao == '4':
-            finalizar()  
+            # Chame a função para obter o número de cadastros
+
+            quantidade_cadastros = contar_cadastros()
+            if quantidade_cadastros >=5 :
+                finalizar() 
+            else:
+                baleia() 
+                input("Para concluir, precisaremos que você cadastre pelo menos 5 produtos. Vamos lá?")
+                main()
         else:
             voltar_ao_menu_principal()
             print("Opção inválida. Tente novamente.")
+
+
+# Menu opcao cadastro
+
+def menu_opcao_cadastro(parametro):
+    while True:
+        if parametro == 1:
+            print("1. Cadastrar Categoria ")
+            print("2. Voltar")
+            opcao = input("\nEscolha uma opção: ")
+            if opcao == '1':
+                listar_categorias()
+            else:
+                main()
+        elif parametro == 2:
+            print("1. Cadastrar Embalagem ")
+            print("2. Voltar")
+            opcao = input("\nEscolha uma opção: ")
+            if opcao == '1':
+                listar_embalagens()
+            else:
+                main()
+        else:
+            print("Parâmetro inválido.")
+
+def contar_cadastros():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT COUNT(*) FROM TB_PRODUTO")
+    quantidade = cursor.fetchone()[0]  # Captura o resultado da contagem
+    conexao.close()
+    return quantidade
 
 # Função principal
 
@@ -402,6 +489,10 @@ def main():
     os.system('cls')
     nome_app()
     #criar_tabelas()
+    # Chame a função para obter o número de cadastros
+    quantidade_cadastros = contar_cadastros()
+    print("Número total de cadastros:", quantidade_cadastros,'\n')
+
     menu_principal()
 
 if __name__ == "__main__":
