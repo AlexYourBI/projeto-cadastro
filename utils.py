@@ -5,14 +5,8 @@ from tabulate import tabulate
 from tqdm import tqdm
 import random
 from colorama import Fore, Style
-import keyboard
-import webbrowser
 from db_connection import apaga_csv,exportar_para_csv, criar_tabelas
 #abertura do sistema com abresentação do gato e a barra de carregamento
-
-#---------------
-
-palavras = ['alex', 'python', 'fiap','leo','joao','minas','gabriel', 'zl']
 
 def barra():
     # Função para imprimir a barra de carregamento
@@ -100,153 +94,6 @@ def baleia():
 ''' 
 + Style.RESET_ALL)  # Imprime o texto com a cor selecionada
  
-def imagem_caca_palavra():
-    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
-    print(color +
-        '''          
-P	Y	T	H	O	N	S					A
-                            Q				U
-M	E	S	E	R	A	V	I	L			G
-Z	O	N	A	L	E	S	T	E	M	G	U
-                C	J	O	Ã	O			S
-                H				N			T
-F			    A				A			O
-    I		T	G	A	B	R	I	E	L
-        A	G		L		D			
-            P		E		O			
-            T		X					
-D	A	T	A	S	C	I	E	N	C	E	
-
-  ALEX     AUGUSTO   CHATGPT   DATASCIENCE   
-  FIAP     GABRIEL    JOÃO      LEONARDO
-MESERAVI   PYTHON      SQL     ZONALESTEMG
-                  '''+ Style.RESET_ALL)  # Imprime o texto com a cor selecionada 
-   
-def escolher_palavra():
-    return random.choice(palavras)
-
-def jogar():
-    palavra = escolher_palavra()
-    letras_erradas = ''
-    letras_corretas = ''
-    tentativas = 6
-    desenho_bonequinho = [
-        """
-           +---+
-               |
-               |
-               |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-               |
-               |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-               |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-           |   |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-          /|   |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-          /|\  |
-               |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-          /|\  |
-          /    |
-               |
-        =========
-        """,
-        """
-           +---+
-           |   |
-           O   |
-          /|\  |
-          / \  |
-               |
-        =========
-        """
-    ]
-
-    while True:
-        # Mostra o estado atual da palavra
-        palavra_secreta = ''
-        for letra in palavra:
-            if letra in letras_corretas:
-                palavra_secreta += letra
-            else:
-                palavra_secreta += '_'
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print('Palavra:', palavra_secreta)
-        print('Tentativas restantes:', tentativas)
-        print('Letras erradas:', letras_erradas)
-
-        # Mostra o desenho do bonequinho correspondente às tentativas restantes
-        print(desenho_bonequinho[6 - tentativas])
-
-        # Verifica se o jogador venceu
-        if '_' not in palavra_secreta:
-            input()
-            print('Parabéns! Você venceu!')
-            break
-            
-        # Verifica se o jogador perdeu
-        if tentativas == 0:
-            input()
-            print('Game over! A palavra era:', palavra)
-            break
-        # Solicita uma letra ao jogador
-        letra = input('Digite uma letra: ').lower()
-
-        # Verifica se a letra já foi escolhida antes
-        if letra in letras_corretas or letra in letras_erradas:
-            print('Você já escolheu esta letra. Tente novamente.')
-            continue
-
-        # Verifica se a letra está na palavra
-        if letra in palavra:
-            letras_corretas += letra
-        else:
-            letras_erradas += letra
-            tentativas -= 1
-
 def caca_palavra():
     try:
         tempo_em_segundos = int(input("Informe o tempo em segundos: "))
@@ -275,24 +122,6 @@ def exibir_subtitulo(texto):
     print(linha)
     print()
 
-def link():
-
-
-
-    
-    #print("https://www.linkedin.com/in/alexlourenc/")
-   
-    #webbrowser.open("https://www.linkedin.com/in/alexlourenc/")
-    
-    keyboard.wait("enter")
-
-    url()
-    
-def url(): 
-    webbrowser.open("https://www.linkedin.com/in/alexlourenc/")
-
-    exit()
-
 #---------------------------------------------------------------------------------------------------------
 
 def abertura():
@@ -309,23 +138,6 @@ def finalizar():
     time.sleep(2) 
     joia()
     time.sleep(2) 
-    os.system('Cls')
-    
-    
-   # print('Bem vindo ao BONUS... \n')  
-   
-   # opcoes = [1,2,3 ]
-   # opcao_escolhida = random.choice(opcoes)
-
-   # if opcao_escolhida == 1:
-             
-   #    caca_palavra ()  
-                    
-   # elif opcao_escolhida== 2:
-   #    jogar()
-                
-    
-    
     os.system('Cls')
     print('''Obrigado por utilizar nosso APP...
                   
