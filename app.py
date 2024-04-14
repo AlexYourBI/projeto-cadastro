@@ -2,9 +2,211 @@ import sqlite3
 import os
 from tabulate import tabulate
 from colorama import Fore, Style
-from utils import baleia,abertura,exibir_subtitulo,nome_app,finalizar
+import csv
+import time
+import sys
+from tqdm import tqdm
+import random
 
 contador = 0
+
+# Função para criar as tabelas se ainda não existirem no banco de dados
+def criar_tabelas():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS TB_EMBALAGEM (
+                        CD_EMBALAGEM INTEGER PRIMARY KEY,
+                        DS_EMBALAGEM TEXT)''')
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS TB_CATEGORIA (
+                        CD_CATEGORIA INTEGER PRIMARY KEY,
+                        DS_CATEGORIA TEXT)''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS TB_PRODUTO (
+                        CD_PRODUTO INTEGER PRIMARY KEY,
+                        CD_EMBALAGEM INTEGER,
+                        CD_CATEGORIA INTEGER,
+                        DS_PRODUTO TEXT,
+                        VL_PRECO REAL,
+                        FOREIGN KEY(CD_CATEGORIA) REFERENCES TB_CATEGORIA(CD_CATEGORIA))''')
+    
+    conexao.commit()
+    conexao.close()
+   
+    # Exportar dados para CSV
+
+def exportar_para_csv():
+    conexao = sqlite3.connect('cadastro_produtos.db')
+    cursor = conexao.cursor()
+
+    # Consulta SQL para recuperar os dados das tabelas
+    cursor.execute('''SELECT * FROM TB_EMBALAGEM''')
+    embalagens = cursor.fetchall()
+
+    cursor.execute('''SELECT * FROM TB_CATEGORIA''')
+    categorias = cursor.fetchall()
+
+    cursor.execute('''SELECT * FROM TB_PRODUTO''')
+    produtos = cursor.fetchall()
+
+    # Exportar dados para o arquivo CSV
+    with open('embalagens.csv', 'w', newline='') as arquivo_csv:
+        escritor_csv = csv.writer(arquivo_csv)
+        escritor_csv.writerow(['CD_EMBALAGEM', 'DS_EMBALAGEM'])
+        escritor_csv.writerows(embalagens)
+
+    with open('categorias.csv', 'w', newline='') as arquivo_csv:
+        escritor_csv = csv.writer(arquivo_csv)
+        escritor_csv.writerow(['CD_CATEGORIA', 'DS_CATEGORIA'])
+        escritor_csv.writerows(categorias)
+
+    with open('produtos.csv', 'w', newline='') as arquivo_csv:
+        escritor_csv = csv.writer(arquivo_csv)
+        escritor_csv.writerow(['CD_PRODUTO', 'CD_EMBALAGEM','CD_CATEGORIA', 'DS_PRODUTO', 'VL_PRECO'])
+        escritor_csv.writerows(produtos)
+
+    conexao.close()
+    # Verifica se os arquivos CSV já existem e, se sim, os exclui
+
+def apaga_csv():
+    if os.path.exists('embalagens.csv'):
+        os.remove('embalagens.csv')
+
+    if os.path.exists('categorias.csv'):
+        os.remove('categorias.csv')
+
+    if os.path.exists('produtos.csv'):
+        os.remove('produtos.csv')
+     
+#--------------------------------------------------------------------------------------------------------------------------------
+
+#abertura do sistema com abresentação do gato e a barra de carregamento
+
+def barra():
+    # Função para imprimir a barra de carregamento
+    def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
+        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        filled_length = int(length * iteration // total)
+        bar = fill * filled_length + '-' * (length - filled_length)
+        sys.stdout.write('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix))
+        sys.stdout.flush()  # Forçar a exibição da barra de progresso na tela
+
+    # Configurações da barra de carregamento
+    total_steps = 10
+    bar_length = 50
+    
+    for i in range(total_steps):
+        print_progress_bar(i + 1, total_steps, prefix='Progresso:', suffix='Completo', length=bar_length)
+        time.sleep(0.5)  # Simula o tempo de espera entre cada etapa 
+
+def gato():
+    print('\nIniciando abertura do APP de SGV...')
+    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
+    print(color + '''
+
+───▄▄─▄████▄▐▄▄▄▌
+──▐──████▀███▄█▄▌
+▐─▌──█▀▌──▐▀▌▀█▀
+─▀───▌─▌──▐─▌
+─────█─█──▐▌█
+
+''' + Style.RESET_ALL)  # Imprime o texto com a cor selecionada
+   
+def msg_abertura():
+    print("\nAbertura do Sistema de Cadstro SGV concluída!")
+    time.sleep(0.5)
+
+def nome_app():
+    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
+    print(color +'''
+█▀▀ ▄▀█ █▀▄ ▄▀█ █▀ ▀█▀ █▀█ █▀█   █▀▄ █▀▀   █▀█ █▀█ █▀█ █▀▄ █░█ ▀█▀ █▀█ █▀   █▀ █▀▀ █░█
+█▄▄ █▀█ █▄▀ █▀█ ▄█ ░█░ █▀▄ █▄█   █▄▀ ██▄   █▀▀ █▀▄ █▄█ █▄▀ █▄█ ░█░ █▄█ ▄█   ▄█ █▄█ ▀▄▀ 
+''' 
++ Style.RESET_ALL)  # Imprime o texto com a cor selecionada
+
+def nome_grupo():
+    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
+    print(color +''' 
+
+
+        ▀█ █▀█ █▄░█ ▄▀█   █░░ █▀▀ █▀ ▀█▀ █▀▀   ▄▄ █▀▄▀█ █▀▀
+        █▄ █▄█ █░▀█ █▀█   █▄▄ ██▄ ▄█ ░█░ ██▄   ░░ █░▀░█ █▄█   
+                          
+        '''+ Style.RESET_ALL)  # Imprime o texto com a cor selecionada    
+  
+def joia():
+    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
+    print(color +'''
+  
+            ░░░░░░░░░░░░░░░░░░░█████████
+            ░░███████░░░░░░░░░░███▒▒▒▒▒▒▒▒███
+            ░░█▒▒▒▒▒▒█░░░░░░░███▒▒▒▒▒▒▒▒▒▒▒▒▒███
+            ░░░█▒▒▒▒▒▒█░░░░██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+            ░░░░█▒▒▒▒▒█░░░██▒▒▒▒▒██▒▒▒▒▒▒██▒▒▒▒▒███
+            ░░░░░█▒▒▒█░░░█▒▒▒▒▒▒████▒▒▒▒████▒▒▒▒▒▒██
+            ░░░█████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+            ░░░█▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒▒██
+            ░██▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒██▒▒▒▒▒▒▒▒▒▒██▒▒▒▒██
+            ██▒▒▒███████████▒▒▒▒▒██▒▒▒▒▒▒▒▒██▒▒▒▒▒██
+            █▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒████████▒▒▒▒▒▒▒██
+            ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+            ░█▒▒▒███████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+            ░██▒▒▒▒▒▒▒▒▒▒████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█
+            ░░████████████░░░█████████████████
+ 
+                  '''+ Style.RESET_ALL)  # Imprime o texto com a cor selecionada 
+    
+def baleia():
+    color = random.choice([Fore.RED, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.MAGENTA])
+    print(color +
+          '''
+▄██████████████▄▐█▄▄▄▄█▌
+██████▌▄▌▄▐▐▌███▌▀▀██▀▀
+████▄█▌▄▌▄▐▐▌▀███▄▄█▌
+▄▄▄▄▄██████████████▀
+
+''' 
++ Style.RESET_ALL)  # Imprime o texto com a cor selecionada
+ 
+
+def exibir_subtitulo(texto):
+    ''' Exibe um subtítulo estilizado na tela
+
+    Inputs:
+    - texto: str - O texto do subtítulo
+    '''
+    os.system('cls')
+    linha = '*' * (len(texto))
+    print(linha)
+    print(texto)
+    print(linha)
+    print()
+
+#---------------------------------------------------------------------------------------------------------
+
+def abertura():
+    gato()
+    barra()
+    criar_tabelas()
+    msg_abertura()
+
+def finalizar():
+    apaga_csv()
+    exportar_para_csv()
+    os.system('Cls')
+    nome_grupo()
+    time.sleep(2) 
+    joia()
+    time.sleep(2) 
+    os.system('Cls')
+    print('''Obrigado por utilizar nosso APP...
+                  
+                  ''')        
+            
+    exit()
+
+#-----------------------------------------------------------------------------------------------
 
 # Função para inserir uma nova embalagem
 def inserir_embalagem():
