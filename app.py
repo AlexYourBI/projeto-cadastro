@@ -5,7 +5,6 @@ from colorama import Fore, Style
 import csv
 import time
 import sys
-from tqdm import tqdm
 import random
 
 contador = 0
