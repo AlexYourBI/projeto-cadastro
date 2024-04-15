@@ -170,6 +170,7 @@ def baleia():
 + Style.RESET_ALL)  # Imprime o texto com a cor selecionada
  
 
+
 def exibir_subtitulo(texto):
     ''' Exibe um subtítulo estilizado na tela
 
